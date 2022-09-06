@@ -1,25 +1,28 @@
 import java.util.*;
 
-public class LRU<K, V> {
+public class LRUGeneric<K, V> {
 
     class Node<K, V> {
-            K key;
-            V value;
-            Node<K, V> next;
-            Node<K, V> prev;
+        K key;
+        V value;
+        Node<K, V> next;
+        Node<K, V> prev;
     }
-    
-    Map<K,Node<K,V>> map = new HashMap<K, Node<K, V>>();
-    int capacity;
-    Node<K, V> head = new Node();
-    Node<K, V> tail = new Node();
 
-    public LRU(int capacity) {
+    Map<K,Node<K,V>> map;
+    int capacity;
+    Node<K, V> head;
+    Node<K, V> tail;
+
+    public LRUGeneric(int capacity) {
         this.capacity = capacity;
+        head = new Node();
+        tail = new Node();
         head.next = tail;
         tail.prev = head;
+        map = new HashMap<>();
     }
-    
+
     private void remove(Node node) {
         node.next.prev = node.prev;
         node.prev.next = node.next;
@@ -28,10 +31,10 @@ public class LRU<K, V> {
     private void add(Node node) {
         node.next = head.next;
         node.prev = head;
-        head.next = node;
         head.next.prev = node;
+        head.next = node;
     }
-    
+
 
     public void put(K k, V v) {
         Node node = map.get(k);
@@ -44,7 +47,7 @@ public class LRU<K, V> {
                 map.remove(tail.prev.key);
                 remove(tail.prev);
             }
-            
+
             Node<K, V> newNode = new Node();
             newNode.key = k;
             newNode.value = v;
@@ -52,27 +55,34 @@ public class LRU<K, V> {
             add(newNode);
         }
     }
-    
-        public V get(K k) {
+
+    public V get(K k) {
+
         if (map.containsKey(k)) {
             Node<K, V> node = map.get(k);
             remove(node);
             add(node);
             return node.value;
         }
-        
-    }
-    
 
- public static void main(String[] args) {
-      
+        return null;
+
+    }
+
+
+    public static void main(String[] args) {
+
         int capacity = 2;
-        LRU<Integer, Integer> lru = new LRU<Integer, Integer>(capacity);
-        lru.put(1, 2);
-  
-        Integer val = lru.get(1);
-  
-        System.out.print(val);
-    
-   }
+        LRUGeneric<Integer, Integer> lru = new LRUGeneric<Integer, Integer>(capacity);
+        lru.put(1, 1);
+        lru.put(2, 2);
+        System.out.println(lru.get(1));
+        lru.put(3, 3);
+        System.out.println(lru.get(2));
+        System.out.println(lru.get(1));
+        System.out.println(lru.get(3));
+        lru.put(4,4);
+        System.out.println(lru.get(1));
+
+    }
 }
